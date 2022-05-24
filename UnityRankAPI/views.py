@@ -1,19 +1,38 @@
 #프레임워크
-from django.shortcuts import render
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework import status
-from django.http import Http404
+
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from .permissions import IsOwnerOrReadOnly
+from rest_framework import viewsets
 #데어터 처리
 from .models import GameRank
 from .serializers import GameRankSerializer
 
 
-# Create your views here.
-#GET,POST 부분
+class GameRankViewSet(viewsets.ModelViewSet):
+    # authentication, permission 추가
+    authentication_classes = [BasicAuthentication, SessionAuthentication]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+
+    queryset = GameRank.objects.all()
+    serializer_class = GameRankSerializer
+
+    #serializer.save() 재정의
+    def perform_create(self, serializer):
+        serializer.save(user = self.request.user)
+
+'''
+####APIView를 활용한 방식
+from django.shortcuts import render
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import status
+from django.http import Http404
+
 class GameRankListAPI(APIView):
-    
-    #TODO 페이징 기능 추가
+    # authentication, permission 추가
+    authentication_classes = [BasicAuthentication, SessionAuthentication]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     #list로 보여줄떄
     def get(self, request):
         gameRankList = GameRank.objects.all() #질의할 쿼리생성
@@ -25,13 +44,14 @@ class GameRankListAPI(APIView):
     def post(self, request):
         serializer = GameRankSerializer(data = request.data)
         if serializer.is_valid(): #유효성 검사
-            serializer.save() #저장
+            serializer.save(user=self.request.user) #저장
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-#하나씩 조회
 class GameRankDetailAPI(APIView):
+    # authentication, permission 추가
+    authentication_classes = [BasicAuthentication, SessionAuthentication]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     #해당 객체 가져오기
     def get_object(self, pk):
         try:
@@ -46,57 +66,19 @@ class GameRankDetailAPI(APIView):
         return Response(serializer.data)
 
 
-    '''
+
     #수정기능(불필요)
     def put(self, request, pk, format=None):
         gameRankObject = self.get_object(pk)
         serializer = GameRankSerializer(gameRankObject, data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(user=self.request.user)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    '''
+
     #삭제(불필요)
     def delete(self, request, pk, format= None):
         gameRankObject =  self.get_object(pk)
         gameRankObject.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-
-'''
-#뷰에서 get과 post
-@csrf_exempt
-def gamerank_list(request):
-    if request.method == 'GET':
-        query_set = GameRank.objects.all()
-        serializer = GameRankSerializer(query_set, many = True)
-        return JsonResponse(serializer.data, safe=False)
-
-    elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = GameRankSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
-
-
-@csrf_exempt
-def gameranks(request, pk):
-    obj = GameRank.objects.get(pk = pk)
-
-    if request.method == 'GET':
-        serializer =GameRankSerializer(obj)
-        return JsonResponse(serializer.data,safe=False)
-    elif request.method == 'PUT':
-        data = JSONParser().parse(request)
-        serializer = GameRankSerializer(obj,data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
-    elif request.method == 'DELETE' :
-        obj.delete()
-        return HttpResponse(status=204)
 '''

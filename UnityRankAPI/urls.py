@@ -1,11 +1,11 @@
-from django.urls import path
-from rest_framework.urlpatterns import format_suffix_patterns
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import GameRankViewSet
 
-from . import views
+router = DefaultRouter()
+# 첫 번째 인자는 url의 prefix, 두 번째 인자는 ViewSet
+router.register('gamerank', GameRankViewSet )
 
 urlpatterns = [
-    path('',views.GameRankListAPI.as_view()),
-    path('<int:pk>/',views.GameRankDetailAPI.as_view()),
+    path('', include(router.urls)),
 ]
-
-urlpatterns = format_suffix_patterns(urlpatterns)

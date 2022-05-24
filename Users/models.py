@@ -35,8 +35,8 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser):
     id = models.AutoField(primary_key=True)
-    email = models.EmailField(default='', max_length=100, null=False, blank=False, unique=True)
-    nickname = models.CharField(default='', max_length=100, null=False, blank=False, unique=True)
+    email = models.EmailField(default='', max_length=255, null=False, blank=False, unique=True)
+    nickname = models.CharField(default='', max_length=255, null=False, blank=False, unique=True)
     name = models.CharField(default='', max_length=100, null=False, blank=False)
 
     # 유저 모델의 필수 필드
@@ -47,10 +47,11 @@ class User(AbstractBaseUser):
     objects = UserManager()
 
     # 사용자의 username 필드는 닉네임
-    USERNAME_FIELD = 'nickname'
+    #USERNAME_FIELD = 'nickname'
+    USERNAME_FIELD = 'email'
 
     # 필수로 작성해야하는 필드
-    REQUIRED_FIELDS = ['email', 'name']
+    REQUIRED_FIELDS = ['nickname', 'name']
 
     def __str__(self):
         return self.nickname

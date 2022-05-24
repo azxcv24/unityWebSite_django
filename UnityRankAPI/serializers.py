@@ -2,14 +2,8 @@ from rest_framework import serializers
 from .models import GameRank
 
 class GameRankSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source= 'user.nickname')
     class Meta:
         model = GameRank
-        fields = '__all__'
-        #fields = ('id', 'nickName','playTime','deathCount','gameVersion')
+        fields = ['id', 'user','playTime', 'deathCount','gameVersion' , 'createdTime']
 
-    '''
-    userEmail = serializers.SerializerMethodField("get_userEmail")
-
-    def get_userEmail(self, obj):
-        return obj.userEmail
-    '''

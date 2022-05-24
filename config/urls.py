@@ -8,5 +8,5 @@ urlpatterns = [
 
     path('user/',include('Users.urls')),
 
-    path('gamerank/',include('UnityRankAPI.urls')),
+    path('',include('UnityRankAPI.urls')),
 ]
