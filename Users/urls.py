@@ -1,9 +1,8 @@
-from django.urls import path
-from .views import RegistrationAPI, LoginAPI, UserAPI, ProfileUpdateAPI
+from django.urls import path, include
+from . import views
+from rest_framework import urls
 
 urlpatterns = [
-    path("auth/register", RegistrationAPI.as_view()),
-    path("auth/login", LoginAPI.as_view()),
-    path("auth/user", UserAPI.as_view()),
-    path("auth/profile/<int:user_pk>/update/", ProfileUpdateAPI.as_view()),
+    path('signup/', views.UserCreate.as_view()),
+    path('api-auth/', include('rest_framework.urls')),
 ]
