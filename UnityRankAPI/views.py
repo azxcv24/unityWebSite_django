@@ -1,9 +1,8 @@
-#프레임워크
-
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from .permissions import IsOwnerOrReadOnly
 from rest_framework import viewsets
+from knox.models import AuthToken
 #데어터 처리
 from .models import GameRank
 from .serializers import GameRankSerializer
@@ -11,7 +10,7 @@ from .serializers import GameRankSerializer
 
 class GameRankViewSet(viewsets.ModelViewSet):
     # authentication, permission 추가
-    authentication_classes = [BasicAuthentication, SessionAuthentication]
+    authentication_classes = [BasicAuthentication, SessionAuthentication,TokenAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     queryset = GameRank.objects.all()
