@@ -2,23 +2,36 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from .permissions import IsOwnerOrReadOnly
 from rest_framework import viewsets
-from knox.models import AuthToken
+from rest_framework.filters import OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.pagination import PageNumberPagination
 #데어터 처리
 from .models import GameRank
 from .serializers import GameRankSerializer
 
+#페이징
+class LargeResultsSetPagination(PageNumberPagination):
+    page_size = 20
+    page_query_param = 'page_size'
+    #max_page_size = 100
+
 
 class GameRankViewSet(viewsets.ModelViewSet):
-    # authentication, permission 추가
+    # authentication(인증방식)), permission 추가
     authentication_classes = [BasicAuthentication, SessionAuthentication,TokenAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly] #작성시 로그인필요
 
-    queryset = GameRank.objects.all()
+    queryset = GameRank.objects.all().order_by("playTime", "deathCount");
     serializer_class = GameRankSerializer
+    pagination_class = LargeResultsSetPagination
+    #필터 설정
+    #filter_backends = [DjangoFilterBackend, OrderingFilter]
+    #filterset_fields = ['user', 'createdTime', 'gameVersion']
+    #ordering_fields = ['playTime']
 
     #serializer.save() 재정의
     def perform_create(self, serializer):
-        serializer.save(user = self.request.user)
+        serializer.save(user = self.request.user) #user정보 저장
 
 '''
 ####APIView를 활용한 방식
