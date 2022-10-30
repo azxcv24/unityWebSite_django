@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'knox',
     'UnityRankAPI',
     'Users',
+    'corsheaders', # CORS 관련 추가
 ]
 
 MIDDLEWARE = [
@@ -48,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',     # CORS 관련 추가
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -132,3 +134,11 @@ REST_FRAMEWORK = {
     #'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication',),
     'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework.authentication.TokenAuthentication',),
 }
+
+# CORS 관련 추가
+CORS_ORIGIN_WHITELIST = ['http://127.0.0.1:3000',
+                         'http://localhost:3000',
+                         'http://localhost:8000',
+                         'http://2022unity.two4.de',
+                         'https://2022unity.two4.de',]
+CORS_ALLOW_CREDENTIALS = True
